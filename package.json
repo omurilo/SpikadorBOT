@@ -1,0 +1,30 @@
+{
+  "name": "spikador",
+  "version": "1.0.0",
+  "description": "![logo spikador](https://user-images.githubusercontent.com/74389154/104830749-72bc9b80-5860-11eb-9ef7-03093d2dd120.png)",
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "google-tts-api": "^2.0.2",
+    "pm2": "^4.5.6",
+    "socket.io": "^4.0.1",
+    "tmi.js": "^1.8.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node index.js",
+    "start": "pm2-runtime start ecosystem.config.js --env production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gurgelgermano/SpikadorBOT.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gurgelgermano/SpikadorBOT/issues"
+  },
+  "homepage": "https://github.com/gurgelgermano/SpikadorBOT#readme"
+}
