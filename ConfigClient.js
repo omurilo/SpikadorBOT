@@ -1,3 +1,5 @@
+const { profanity } = require("@2toad/profanity");
+
 class ConfigClient {
   constructor() {
     this._canalDoBot = process.env.TMI_USERNAME; // nome do bot

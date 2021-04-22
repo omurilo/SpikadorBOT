@@ -14,7 +14,7 @@ class AudiosMP3 extends ComandosModel {
         ComandosModel.titles.broadcaster,
       ])
     ) {
-      io.to(channel.substr(1)).emit("spikador", `/mp3/${audio}.mp3`);
+      io.to(channel.substr(1)).emit("falador", `/mp3/${audio}.mp3`);
       this.client.say(
         channel,
         `/me @${user.username} mandou tocar o audio ${audio}`

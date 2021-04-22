@@ -22,7 +22,7 @@
       socket.on("connect", () => {
         socket.emit("joinRoom", channel);
       });
-      socket.on("spikador", (base64) => {
+      socket.on("falador", (base64) => {
         queue.add(base64);
         animation.play();
         queue.play();
