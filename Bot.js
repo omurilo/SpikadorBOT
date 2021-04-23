@@ -17,43 +17,32 @@ class Bot extends ComandosModel {
   }
 
   run(channel, user, message, io) {
-    if (
-      this.podeExecutar(user, [
-        ComandosModel.titles.moderator,
-        ComandosModel.titles.subscriber,
-        ComandosModel.titles.vip,
-        ComandosModel.titles.broadcaster,
-      ])
-    ) {
-      const arr = message.substr(8).split(" ");
-      let idioma = arr[0];
+    let idioma;
+    let finalMessage;
+    const haveLanguage = String(message).match(/^\[[\w\-]+\]/);
 
-      let finalMessage = arr.slice(1).join(" ");
-
-      if (!idioma) {
-        idioma = "pt";
-      }
-
-      if (this.profanity.exists(finalMessage)) {
-        finalMessage = this.profanity.censor(finalMessage);
-      }
-
-      googleTTS
-        .getAudioBase64(`${user.username} Disse: ${finalMessage}`, {
-          lang: idioma,
-        })
-        .then((res) => {
-          io.to(channel.substr(1)).emit(
-            "falador",
-            `data:audio/ogg;base64,${res}`
-          );
-        });
+    if (!haveLanguage) {
+      idioma = "pt";
+      finalMessage = message;
     } else {
-      this.client.say(
-        channel,
-        `/me @${user.username} O comando !falador é exclusivo p/ Subs, Mods ou Vips`
-      );
+      idioma = haveLanguage[0].replace(/[\[\]]/g, "");
+      finalMessage = haveLanguage.input.slice(idioma.length);
     }
+
+    if (this.profanity.exists(finalMessage)) {
+      finalMessage = this.profanity.censor(finalMessage);
+    }
+
+    googleTTS
+      .getAudioBase64(`${user} Disse: ${finalMessage}`, {
+        lang: idioma,
+      })
+      .then((res) => {
+        io.to(channel.substr(1)).emit(
+          "falador",
+          `data:audio/ogg;base64,${res}`
+        );
+      });
   }
 }
 

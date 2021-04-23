@@ -35,11 +35,9 @@ const audio = new AudiosMP3(client);
 
 client.connect();
 
-client.on("connected", entrouNoChatDaTwitch);
-client.on("message", mensagemChegou);
-client.on("redeem", (channel, username, rewardtype, tags, msg) => {
-  console.log(rewardtype, tags, msg);
-});
+client.on("connected", enterOnTwitchChat);
+client.on("message", messageToBot);
+client.on("redeem", redeemAudio);
 
 app.use(express.static("public"));
 server.listen(process.env.PORT);
@@ -49,38 +47,48 @@ io.on("connection", (socket) => {
   });
 });
 
-function entrouNoChatDaTwitch(endereco, porta) {
+function enterOnTwitchChat(endereco, porta) {
   console.log(`* Bot entrou no endereço ${endereco}:${porta}`);
 }
 
-function mensagemChegou(channel, user, message, self) {
-  if (self || !message.startsWith("!")) return;
-
-  const command = message.slice(0, 13).split(" ")[0];
-  const falador =
-    command.toLowerCase().indexOf("!falador") === 0 ? command : undefined;
-
-  const audios = {
-    [falador]: {
+function redeemAudio(channel, user, rewardtype, tags, message) {
+  const commands = {
+    "71c3a0a9-d3cf-40b8-867d-b85ac0faef58": {
       instance: fala,
       method: "run",
       args: [channel, user, message, io],
     },
-    "!careca": {
+    "886a1252-e968-4340-94de-bb8605ac72ba": {
       instance: audio,
       method: "play",
-      args: ["careca", channel, user, message, io],
-    },
-    "!botfalador": {
-      instance: client,
-      method: "say",
-      args: [channel, "Falador é um bot de reprodução de falas e audios"],
+      args: ["costaaaa", channel, user, message, io],
     },
   };
 
-  const options = audios[command];
+  const options = commands[rewardtype];
 
   if (options) {
     options.instance[options.method](...options.args);
   }
+}
+
+function messageToBot(channel, user, command, self) {
+  if (self || !message.startsWith("!")) return;
+
+  const commands = {
+    "!falador": {
+      instance: client,
+      method: "say",
+      args: [
+        channel,
+        `@${user} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!"`,
+      ],
+    },
+  };
+
+  const execute = commands[command];
+
+  if (!execute) return;
+
+  execute.instance[execute.method](...execute.args);
 }
