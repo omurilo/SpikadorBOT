@@ -73,7 +73,7 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 }
 
 function messageToBot(channel, user, command, self) {
-  if (self || !message.startsWith("!")) return;
+  if (self || !command.startsWith("!")) return;
 
   const commands = {
     "!falador": {
