@@ -17,16 +17,17 @@ class Bot extends ComandosModel {
   }
 
   run(channel, user, message, io) {
-    let idioma;
+    let language;
     let finalMessage;
     const haveLanguage = String(message).match(/^\[[\w\-]+\]/);
 
     if (!haveLanguage) {
-      idioma = "pt";
+      language = "pt";
       finalMessage = message;
     } else {
-      idioma = haveLanguage[0].replace(/[\[\]]/g, "");
-      finalMessage = haveLanguage.input.slice(idioma.length);
+      const languageOption = haveLanguage[0];
+      language = languageOption.replace(/[\[\]]/g, "");
+      finalMessage = haveLanguage.input.slice(languageOption.length).trim();
     }
 
     if (this.profanity.exists(finalMessage)) {
@@ -35,7 +36,7 @@ class Bot extends ComandosModel {
 
     googleTTS
       .getAudioBase64(`${user} Disse: ${finalMessage}`, {
-        lang: idioma,
+        lang: language,
       })
       .then((res) => {
         io.to(channel.substr(1)).emit(
