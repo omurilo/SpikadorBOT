@@ -1,16 +1,18 @@
 const dotenv = require("dotenv").config();
-const options = { cors: { origin: "*" } };
 const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
-const io = require("socket.io")(server, options);
+const io = require("socket.io")(server, { cors: { origin: "*" } });
 
 const tmi = require("tmi.js");
 const { username, channel } = require("tmi.js/lib/utils");
 const ConfigClient = require("./ConfigClient.js");
+const Bot = require("./Bot.js");
+const AudioPlayer = require("./AudioPlayer.js");
+
 const config = new ConfigClient();
 
-const optss = {
+const options = {
   options: {
     debug: true,
   },
@@ -25,13 +27,11 @@ const optss = {
   channels: config._canalBotFica,
 };
 
-const client = new tmi.client(optss);
+const client = new tmi.client(options);
 
-const Bot = require("./Bot.js");
 const fala = new Bot(client);
 
-const AudiosMP3 = require("./AudiosMP3.js");
-const audio = new AudiosMP3(client);
+const audio = new AudioPlayer(client);
 
 client.connect();
 
@@ -141,16 +141,17 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
     }
   };
 
-  const options = commands[rewardtype];
+  const execute = commands[rewardtype];
 
-  if (options) {
-    options.instance[options.method](...options.args);
+  if (execute) {
+    execute.instance[execute.method](...execute.args);
   }
 }
 
-function messageToBot(channel, user, command, self) {
+function messageToBot(channel, user, received, self) {
+  const [command, message] = received.trim().split(/\s/gm);
   const reply = replyTaxedBot(user, command);
-  if (self || !command.startsWith("!") && !reply) return;
+  if (self || (!command.startsWith("!") && !reply)) return;
 
   const commands = {
     "!falador": {
@@ -164,7 +165,7 @@ function messageToBot(channel, user, command, self) {
     "!noia": {
       instance: audio,
       method: 'play',
-      args: ['noia', channel, user, command, io, ['mod', 'streamer']]
+      args: ['noia', channel, user, message, io, ["mod", "streamer"]]
     },
     "default": {
       instance: client,
@@ -173,10 +174,13 @@ function messageToBot(channel, user, command, self) {
     }
   };
 
-  const execute = commands[command] ?? reply ? commands.default : null;
+  let execute = commands[command];
+
+  if (reply && !execute) {
+    execute = commands.default;
+  }
 
   if (!execute) return;
-
   execute.instance[execute.method](...execute.args);
 }
 
