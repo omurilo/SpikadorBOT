@@ -52,6 +52,7 @@ function enterOnTwitchChat(endereco, porta) {
 }
 
 function redeemAudio(channel, user, rewardtype, tags, message) {
+  console.info({ rewardtype, message })
   const commands = {
     "71c3a0a9-d3cf-40b8-867d-b85ac0faef58": {
       instance: fala,
@@ -63,6 +64,36 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
       method: "play",
       args: ["costaaaa", channel, user, message, io],
     },
+    '1f2e5cb3-f338-412e-9898-f5df5007bb8b': {
+      instance: audio,
+      method: 'play',
+      args: ['banido', channel, user, message, io]
+    },
+    'a4b8683f-27e4-407b-b8eb-f9ff1667157f': {
+      instance: audio,
+      method: 'play',
+      args: ['peido', channel, user, message, io]
+    },
+    '5c63d121-e389-4713-a2a0-17f5b2840321': {
+      instance: audio,
+      method: 'play',
+      args: ['renk-2', channel, user, message, io]
+    },
+    'b2c068ff-ab17-45b0-8d54-993f3ca8b439': {
+      instance: audio,
+      method: 'play',
+      args: ['matir-2', channel, user, message, io]
+    },
+    '8227be41-424a-4e53-996a-ae5d8afdc74c': {
+      instance: audio,
+      method: 'play',
+      args: ['fofoca', channel, user, message, io]
+    },
+    '504aefba-2081-45a7-a725-55f301e96426': {
+      instance: audio,
+      method: 'play',
+      args: ['cheguei', channel, user, message, io]
+    }
   };
 
   const options = commands[rewardtype];
@@ -73,7 +104,8 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 }
 
 function messageToBot(channel, user, command, self) {
-  if (self || !command.startsWith("!")) return;
+  const reply = replyTaxedBot(user, command);
+  if (self || !command.startsWith("!") && !reply) return;
 
   const commands = {
     "!falador": {
@@ -84,11 +116,28 @@ function messageToBot(channel, user, command, self) {
         `@${user.username} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
       ],
     },
+    "default": {
+      instance: client,
+      method: "say",
+      args: [channel, reply]
+    }
   };
 
-  const execute = commands[command];
+  const execute = commands[command] ?? reply ? commands.default : null;
 
   if (!execute) return;
 
   execute.instance[execute.method](...execute.args);
+}
+
+function replyTaxedBot(user, command) {
+  if (command.includes('na cara do(a) botfalador')) {
+    if (['streamelements', 'nightbot'].includes(user.username)) {
+      user.username = command.split(/\s/gm)[0];
+    }
+
+    return `Tá de tiração comigo é? ${user.username}, esse bot aqui não é educado igual o @streamelements não viu? Toma de volta na sua cara ${user.username}`
+  }
+
+  return false;
 }
