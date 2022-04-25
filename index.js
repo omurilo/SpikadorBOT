@@ -170,7 +170,15 @@ function messageToBot(channel, user, received, self) {
 			method: "say",
 			args: [
 				channel,
-				`@${user.username} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
+				`@${user.username ?? user} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
+			],
+		},
+		"fala": {
+			instance: client,
+			method: "say",
+			args: [
+				channel,
+				`/me ${user.username ?? user} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
 			],
 		},
 		"noia": {
@@ -200,7 +208,9 @@ function checkUsersBlacklist(user) {
 		user = { username: user };
 	}
 
-	return config.usersBlacklist.includes(user.username);
+	const userQuery = new RegExp(user.username, 'gmi')
+
+	return config.usersBlacklist.some(username => userQuery.test(username));
 }
 
 function replyTaxedBot(user, message) {
