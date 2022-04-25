@@ -57,12 +57,12 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 		"71c3a0a9-d3cf-40b8-867d-b85ac0faef58": {
 			instance: fala,
 			method: "run",
-			args: [channel, user, message, io],
+			args: [channel, user, message, io, 2],
 		},
 		"886a1252-e968-4340-94de-bb8605ac72ba": {
 			instance: audio,
 			method: "play",
-			args: ["costaaaa", channel, user, message, io],
+			args: ["costaaaa", channel, user, message, io, 10],
 		},
 		"1f2e5cb3-f338-412e-9898-f5df5007bb8b": {
 			instance: audio,
@@ -77,7 +77,7 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 		"5c63d121-e389-4713-a2a0-17f5b2840321": {
 			instance: audio,
 			method: "play",
-			args: ["renk-2", channel, user, message, io],
+			args: ["renk-2", channel, user, message, io, 5],
 		},
 		"b2c068ff-ab17-45b0-8d54-993f3ca8b439": {
 			instance: audio,
@@ -169,7 +169,7 @@ function messageToBot(channel, user, received, self) {
 		"!noia": {
 			instance: audio,
 			method: "play",
-			args: ["noia", channel, user, message, io, ["mod", "streamer", "sub", "vip"]],
+			args: ["noia", channel, user, message, io, ["mod", "streamer", "sub", "vip"], 5],
 		},
 		default: {
 			instance: client,
@@ -197,6 +197,10 @@ function checkUsersBlacklist(user) {
 }
 
 function replyTaxedBot(user, command) {
+	if (typeof user === "string") {
+		user = { username: user };
+	}
+
 	if (command.includes("na cara do(a) botfalador")) {
 		if (["streamelements", "nightbot"].includes(user.username)) {
 			user.username = command.split(/\s/gm)[0];

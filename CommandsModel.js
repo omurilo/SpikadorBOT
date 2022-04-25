@@ -2,6 +2,7 @@ class CommandsModel {
 	client = null;
 	constructor(_client) {
 		this.client = _client;
+		this.commandsCooldown = new Map();
 	}
 
 	static roles = {
@@ -24,6 +25,25 @@ class CommandsModel {
 		}
 
 		return userTitles.some((element) => roles.includes(element));
+	}
+
+	checkCooldown(command, cooldown) {
+		function parseMinutesToMiliseconds(minutes) {
+			return minutes * 60 * 1000;
+		}
+
+		if (this.commandsCooldown.has(command)) {
+			const lastExecution = this.commandsCooldown.get(command);
+			const nextExecution =
+				lastExecution.executed.getTime() + parseMinutesToMiliseconds(lastExecution.cooldown);
+
+			if (nextExecution <= new Date().getTime()) {
+				return false;
+			}
+		}
+
+		this.commandsCooldown.set(command, { cooldown, executed: new Date() });
+		return true;
 	}
 }
 module.exports = CommandsModel;

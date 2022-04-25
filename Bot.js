@@ -16,10 +16,14 @@ class Bot extends CommandsModel {
 		this.profanity.addWords(badwords);
 	}
 
-	run(channel, user, message, io) {
+	run(channel, user, message, io, roles = undefined, cooldown = undefined) {
 		let language;
 		let finalMessage;
 		const haveLanguage = String(message).match(/^\[[\w\-]+\]/);
+
+		if (roles && !this.canExecute(user, roles)) {
+			return false;
+		}
 
 		if (!haveLanguage) {
 			language = "pt";
@@ -32,6 +36,13 @@ class Bot extends CommandsModel {
 
 		if (this.profanity.exists(finalMessage)) {
 			finalMessage = this.profanity.censor(finalMessage);
+		}
+
+		if (cooldown && !this.checkCooldown(audio, cooldown)) {
+			return this.client.say(
+				channel,
+				`/me @${user.username ?? user} tu foi taxado pelo cooldown, não foi dessa vez!`
+			);
 		}
 
 		googleTTS

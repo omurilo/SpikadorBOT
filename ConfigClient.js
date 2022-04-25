@@ -6,6 +6,8 @@ class ConfigClient {
     this._tokenTwitch = process.env.TMI_OAUTH;
     this._canalBotFica = String(process.env.TWITCH_CHANNELS ?? '').split(",");
     this._userBlacklist = String(process.env.USER_BLACKLIST ?? '').split(',');
+
+    console.info("Users in the blacklist: ", this._userBlacklist);
   }
 
   get canalBot() {
