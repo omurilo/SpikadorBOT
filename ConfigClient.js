@@ -2,9 +2,10 @@ const { profanity } = require("@2toad/profanity");
 
 class ConfigClient {
   constructor() {
-    this._canalDoBot = process.env.TMI_USERNAME; // nome do bot
-    this._tokenTwitch = process.env.TMI_OAUTH; //token do bot -> https://twitchapps.com/tmi/
-    this._canalBotFica = String(process.env.TWITCH_CHANNELS).split(","); // lista de canais que o bot ficará
+    this._canalDoBot = process.env.TMI_USERNAME;
+    this._tokenTwitch = process.env.TMI_OAUTH;
+    this._canalBotFica = String(process.env.TWITCH_CHANNELS ?? '').split(",");
+    this._userBlacklist = String(process.env.USER_BLACKLIST ?? '').split(',');
   }
 
   get canalBot() {
@@ -17,6 +18,10 @@ class ConfigClient {
 
   get botFica() {
     return this._canalBotFica;
+  }
+
+  get usersBlacklist() {
+    return this._userBlacklist;
   }
 }
 
