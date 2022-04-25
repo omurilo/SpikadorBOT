@@ -148,6 +148,10 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 		},
 	};
 
+	if (checkUsersBlacklist(user)) {
+		return client.say(channel, `/me @${user.username} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`);
+	}
+
 	const execute = commands[rewardtype];
 
 	if (execute) {
