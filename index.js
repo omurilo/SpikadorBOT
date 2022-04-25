@@ -10,6 +10,8 @@ const ConfigClient = require("./ConfigClient.js");
 const Bot = require("./Bot.js");
 const AudioPlayer = require("./AudioPlayer.js");
 
+const bots = ["streamelements", "nightbot"]
+
 const config = new ConfigClient();
 
 const options = {
@@ -117,7 +119,7 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 		"3ee6d90d-c162-42c3-96a6-04a350f9aea6": {
 			instance: audio,
 			method: "play",
-			args: ["putaria", channel, user, message, io, null, 2],
+			args: ["putaria", channel, user, message, io, ["mod", "vip", "streamer"], 2],
 		},
 		"4fb99ba7-6dc0-4060-a3be-ebdc223351c6": {
 			instance: audio,
@@ -154,16 +156,16 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 }
 
 function messageToBot(channel, user, received, self) {
-	const [command, message] = received.trim().split(/\s/gm);
-	const reply = replyTaxedBot(user, command);
+	const [_, command, message] = received.match(new RegExp(/^!([a-zA-Z0-9]+)(?:\W+)?(.*)?/)) ?? [];
+	const reply = replyTaxedBot(user, received);
 
-	if (self || (!command.startsWith("!") && !reply)) return;
-	if (command.startsWith("!") && checkUsersBlacklist(user)) {
-		return client.say(channel, `/me @${user.username} tu foi taxado e não pode usar esse comando!`);
+	if (self || (!command && !reply)) return;
+	if (command && checkUsersBlacklist(user)) {
+		return client.say(channel, `/me @${user.username} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`);
 	}
 
 	const commands = {
-		"!falador": {
+		"falador": {
 			instance: client,
 			method: "say",
 			args: [
@@ -171,7 +173,7 @@ function messageToBot(channel, user, received, self) {
 				`@${user.username} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
 			],
 		},
-		"!noia": {
+		"noia": {
 			instance: audio,
 			method: "play",
 			args: ["noia", channel, user, message, io, ["mod", "streamer", "sub", "vip"], 5],
@@ -201,20 +203,20 @@ function checkUsersBlacklist(user) {
 	return config.usersBlacklist.includes(user.username);
 }
 
-function replyTaxedBot(user, command) {
+function replyTaxedBot(user, message) {
 	if (typeof user === "string") {
 		user = { username: user };
 	}
 
-	if (command.includes("na cara do(a) botfalador")) {
-		if (["streamelements", "nightbot"].includes(user.username)) {
-			user.username = command.split(/\s/gm)[0];
+	if (new RegExp(/na cara do\(a\) botfalador/gmi).test(message)) {
+		if (bots.includes(user.username)) {
+			user.username = message.split(/\s/gm)[0];
 		}
 
 		return `Tá de tiração comigo é? ${user.username}, esse bot aqui não é educado igual o @streamelements não viu? Toma de volta na sua cara ${user.username}`;
-	} else if (new RegExp(/A Granada de Rola foi lançada.*botfalador/gm).test(command)) {
-		if (["streamelements", "nightbot"].includes(user.username)) {
-			user.username = command.split(/\s/gm)[0];
+	} else if (new RegExp(/A Granada de Rola foi lançada.*botfalador/gmi).test(message)) {
+		if (bots.includes(user.username)) {
+			user.username = message.split(/\s/gm)[0];
 		}
 
 		return `Tá de tiração comigo é ${user.username}?, Vai mandar granada na casa do seu amigo, aqui não! (DESVIAR)`;
