@@ -37,7 +37,7 @@ class CommandsModel {
 			const nextExecution =
 				lastExecution.executed.getTime() + parseMinutesToMiliseconds(lastExecution.cooldown);
 
-			if (nextExecution <= new Date().getTime()) {
+			if (nextExecution >= new Date().getTime()) {
 				return false;
 			}
 		}
