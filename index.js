@@ -119,7 +119,7 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 		"3ee6d90d-c162-42c3-96a6-04a350f9aea6": {
 			instance: audio,
 			method: "play",
-			args: ["putaria", channel, user, message, io, ["mod", "vip", "streamer"], 2],
+			args: ["putaria", channel, user, message, io, ["mod", "streamer", "vip"], 5],
 		},
 		"4fb99ba7-6dc0-4060-a3be-ebdc223351c6": {
 			instance: audio,
@@ -188,7 +188,7 @@ function messageToBot(channel, user, received, self) {
 		"noia": {
 			instance: audio,
 			method: "play",
-			args: ["noia", channel, user, message, io, ["mod", "streamer", "sub", "vip"], 5],
+			args: ["noia", channel, user, message, io, ["mod", "streamer", "vip"], 5],
 		},
 		default: {
 			instance: client,

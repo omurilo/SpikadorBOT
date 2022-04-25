@@ -22,7 +22,10 @@ class Bot extends CommandsModel {
 		const haveLanguage = String(message).match(/^\[[\w\-]+\]/);
 
 		if (roles && !this.canExecute(user, roles)) {
-			return false;
+			return this.client.say(
+				channel,
+				`/me @${user.username ?? user} Você não pode resgatar esse audio, peça o reembolso dos seus pontos pra algum dos mod inútil que tem ai. (lista de mods: /mods)`
+			);
 		}
 
 		if (!haveLanguage) {
