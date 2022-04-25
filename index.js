@@ -57,87 +57,92 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 		"71c3a0a9-d3cf-40b8-867d-b85ac0faef58": {
 			instance: fala,
 			method: "run",
-			args: [channel, user, message, io, 2],
+			args: [channel, user, message, io, null, 2],
 		},
 		"886a1252-e968-4340-94de-bb8605ac72ba": {
 			instance: audio,
 			method: "play",
-			args: ["costaaaa", channel, user, message, io, 10],
+			args: ["costaaaa", channel, user, message, io, null, 10],
 		},
 		"1f2e5cb3-f338-412e-9898-f5df5007bb8b": {
 			instance: audio,
 			method: "play",
-			args: ["banido", channel, user, message, io, 2],
+			args: ["banido", channel, user, message, io, null, 2],
 		},
 		"a4b8683f-27e4-407b-b8eb-f9ff1667157f": {
 			instance: audio,
 			method: "play",
-			args: ["peido", channel, user, message, io, 2],
+			args: ["peido", channel, user, message, io, null, 2],
 		},
 		"5c63d121-e389-4713-a2a0-17f5b2840321": {
 			instance: audio,
 			method: "play",
-			args: ["renk-2", channel, user, message, io, 5],
+			args: ["renk-2", channel, user, message, io, null, 5],
 		},
 		"b2c068ff-ab17-45b0-8d54-993f3ca8b439": {
 			instance: audio,
 			method: "play",
-			args: ["matir-2", channel, user, message, io, 2],
+			args: ["matir-2", channel, user, message, io, null, 2],
 		},
 		"8227be41-424a-4e53-996a-ae5d8afdc74c": {
 			instance: audio,
 			method: "play",
-			args: ["fofoca", channel, user, message, io, 2],
+			args: ["fofoca", channel, user, message, io, null, 2],
 		},
 		"504aefba-2081-45a7-a725-55f301e96426": {
 			instance: audio,
 			method: "play",
-			args: ["cheguei", channel, user, message, io, 2],
+			args: ["cheguei", channel, user, message, io, null, 2],
 		},
-		"": {
+		"db2ecf40-932d-4dfe-b992-e75af338776b": {
 			instance: audio,
 			method: "play",
-			args: ["brabo", channel, user, message, io, 2],
+			args: ["brabo", channel, user, message, io, null, 2],
 		},
-		"": {
+		"2bb5c38c-e0dd-45c0-892c-25271e4e8056": {
 			instance: audio,
 			method: "play",
-			args: ["chiesa", channel, user, message, io, 2],
+			args: ["chiesa", channel, user, message, io, null, 2],
 		},
-		"": {
+		"bef808ef-f99c-4901-8ee7-956e167b9c63": {
 			instance: audio,
 			method: "play",
-			args: ["noia", channel, user, message, io, 2],
+			args: ["noia", channel, user, message, io, null, 2],
 		},
-		"": {
+		"17943516-fd03-4cc3-b884-fa31e9fad976": {
 			instance: audio,
 			method: "play",
-			args: ["palmas", channel, user, message, io, 2],
+			args: ["palmas", channel, user, message, io, null, 2],
 		},
-		"": {
+		"3ee6d90d-c162-42c3-96a6-04a350f9aea6": {
 			instance: audio,
 			method: "play",
-			args: ["putaria", channel, user, message, io, 2],
+			args: ["putaria", channel, user, message, io, null, 2],
 		},
-		"": {
+		"4fb99ba7-6dc0-4060-a3be-ebdc223351c6": {
 			instance: audio,
 			method: "play",
-			args: ["satanas", channel, user, message, io, 2],
+			args: ["satanas", channel, user, message, io, null, 2],
 		},
-		"": {
+		"41aa7aec-3831-497b-a26e-6cdf179b9eff": {
 			instance: audio,
 			method: "play",
-			args: ["tomar-uma", channel, user, message, io, 2],
+			args: ["tomar-uma", channel, user, message, io, null, 2],
 		},
-		"": {
+		"17355271-76ac-4146-86ef-a6f03cb36a42": {
 			instance: audio,
 			method: "play",
-			args: ["vai-a-merda", channel, user, message, io, 2],
+			args: ["vai-a-merda", channel, user, message, io, null, 2],
 		},
-		"": {
+		"901553c5-356c-4a4e-95ad-8ee252f595c8": {
 			instance: audio,
 			method: "play",
-			args: ["viaje-e-essa", channel, user, message, io, 2],
+			args: ["viaje-e-essa", channel, user, message, io, null, 2],
+		},
+		"359cd70c-8799-4d4c-afd7-94471bfc5b56": {
+			instance: audio,
+			method: "play",
+			args: ["careca", channel, user, message, io, null, 2],
 		},
 	};
 
