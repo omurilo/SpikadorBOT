@@ -41,7 +41,7 @@ class Bot extends CommandsModel {
 			finalMessage = this.profanity.censor(finalMessage);
 		}
 
-		if (cooldown && !this.checkCooldown(audio, cooldown)) {
+		if (cooldown && !this.checkCooldown('fala', cooldown)) {
 			return this.client.say(
 				channel,
 				`/me @${user.username ?? user} tu foi taxado pelo cooldown, não foi dessa vez!`
