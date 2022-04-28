@@ -9,8 +9,10 @@ const { username, channel } = require("tmi.js/lib/utils");
 const ConfigClient = require("./ConfigClient.js");
 const Bot = require("./Bot.js");
 const AudioPlayer = require("./AudioPlayer.js");
+const CommandsModel = require("./CommandsModel.js");
+const blackListUtils = require("./blacklist/usersBlacklist");
 
-const bots = ["streamelements", "nightbot"]
+const bots = ["streamelements", "nightbot"];
 
 const config = new ConfigClient();
 
@@ -35,11 +37,15 @@ const fala = new Bot(client);
 
 const audio = new AudioPlayer(client);
 
+const commandsUtils = new CommandsModel(client);
+
 client.connect();
 
-client.on("connected", enterOnTwitchChat);
-client.on("message", messageToBot);
 client.on("redeem", redeemAudio);
+client.on("message", messageToBot);
+client.on("ban", addUserToBlacklist);
+client.on("timeout", taxUserOnTimeout);
+client.on("connected", enterOnTwitchChat);
 
 app.use(express.static("public"));
 server.listen(process.env.PORT);
@@ -53,7 +59,7 @@ function enterOnTwitchChat(endereco, porta) {
 	console.log(`* Bot entrou no endereço ${endereco}:${porta}`);
 }
 
-function redeemAudio(channel, user, rewardtype, tags, message) {
+async function redeemAudio(channel, user, rewardtype, tags, message) {
 	console.info({ rewardtype, message });
 	const commands = {
 		"71c3a0a9-d3cf-40b8-867d-b85ac0faef58": {
@@ -148,8 +154,11 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 		},
 	};
 
-	if (checkUsersBlacklist(user)) {
-		return client.say(channel, `/me @${user.username} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`);
+	if (await checkUsersBlacklist(user)) {
+		return client.say(
+			channel,
+			`/me @${user.username ?? user} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`
+		);
 	}
 
 	const execute = commands[rewardtype];
@@ -159,36 +168,92 @@ function redeemAudio(channel, user, rewardtype, tags, message) {
 	}
 }
 
-function messageToBot(channel, user, received, self) {
+async function messageToBot(channel, user, received, self) {
 	const [_, command, message] = received.match(new RegExp(/^!([a-zA-Z0-9]+)(?:\W+)?(.*)?/)) ?? [];
 	const reply = replyTaxedBot(user, received);
 
 	if (self || (!command && !reply)) return;
-	if (command && checkUsersBlacklist(user)) {
-		return client.say(channel, `/me @${user.username} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`);
-	}
 
 	const commands = {
-		"falador": {
+		falador: {
 			instance: client,
 			method: "say",
 			args: [
 				channel,
-				`@${user.username ?? user} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
+				`@${
+					user.username ?? user
+				} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
 			],
 		},
-		"fala": {
+		fala: {
 			instance: client,
 			method: "say",
 			args: [
 				channel,
-				`/me ${user.username ?? user} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
+				`/me ${
+					user.username ?? user
+				} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
 			],
 		},
-		"noia": {
+		noia: {
 			instance: audio,
 			method: "play",
 			args: ["noia", channel, user, message, io, ["mod", "streamer", "vip"], 5],
+		},
+		taxar: {
+			middleware: async () => addUserToBlacklistFile(message?.split(/\s/)[0].split(/@/), user),
+			instance: client,
+			method: "say",
+			args: [
+				channel,
+				`Ei ${message?.split(/\s/)[0]} tu foi taxado irmão! Agora está na blacklist e não pode interagir comigo, valeu hein gangsta! Duas palavras pra você: Para Béns!`,
+			],
+		},
+		destaxar: {
+			middleware: async () => removeUserFromBlacklistFile(message?.split(/\s/)[0].split(/@/), user),
+			instance: client,
+			method: "say",
+			args: [
+				channel,
+				`Ei ${message?.split(/\s/)[0]} tu foi destaxado! Agora você não está mais na blacklist e pode interagir comigo, valeu hein gangsta! Duas palavras pra você: Para Béns!`,
+			],
+		},
+		tataxado: {
+			instance: {
+				verify: async (username, user) => {
+					const { userExist } = await checkIfUserIsInBlacklist(username, user);
+
+					return client.say(
+						channel,
+						`É @${user.username ?? user} o usuário ${username} ${
+							userExist ? "está" : "não está"
+						} na blacklist.`
+					);
+				},
+			},
+			method: "verify",
+			args: [message?.split(/\s/)[0].split(/@/), user],
+		},
+		ostaxados: {
+			instance: { verify: async () => {
+				const { users } = await readUsersBlacklistFile(user);
+				const qtyMessages = Math.max(Math.ceil(users.length / 10), 1);
+				for (let step = 0; step < qtyMessages * 10; step+=10) {
+					client.say(channel, `Os usuários na blacklist são: ${users.slice(step, step + 10)}`);
+				}
+			} },
+			method: "verify",
+			args: [],
+		},
+		comandosfalador: {
+			instance: client,
+			method: "say",
+			args: [
+				channel,
+				`Oi ${
+					user.username ?? user
+				}, eu sou o falador! os comandos disponíveis (nem todos você pode usar tá?) são: fala, falador, noia, taxar, destaxar, tataxado, ostaxados`,
+			],
 		},
 		default: {
 			instance: client,
@@ -197,6 +262,14 @@ function messageToBot(channel, user, received, self) {
 		},
 	};
 
+	if (command && (await checkUsersBlacklist(user))) {
+		if (!commands[command]) return;
+		return client.say(
+			channel,
+			`/me @${user.username ?? user} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`
+		);
+	}
+
 	let execute = commands[command];
 
 	if (reply && !execute) {
@@ -204,17 +277,88 @@ function messageToBot(channel, user, received, self) {
 	}
 
 	if (!execute) return;
+	if (execute.middleware) {
+		const { next } = await execute.middleware();
+		if (!next) {
+			return client.say(
+				channel,
+				`@${user.username ?? user} você não pode executar esse comando meu querido!`
+			);
+		}
+	}
+
 	execute.instance[execute.method](...execute.args);
 }
 
-function checkUsersBlacklist(user) {
+async function addUserToBlacklist(channel, user, reason) {
+	await blackListUtils.addUserToBlacklistFile(user.username ?? user);
+	return client.say(
+		channel,
+		`Ihhhhh @${
+			user.username ?? user
+		} tu foi banido hein, você entrou na minha blacklist, quando tu for desbanido ainda estará aqui tá, tem que pedir pra tirarem :D`
+	);
+}
+
+function taxUserOnTimeout(channel, username, reason, duration) {
+	const durationExact = duration > 60 ? Math.ceil(duration / 60) : duration;
+	const stringDuration =
+		duration > 60
+			? durationExact > 1
+				? `${durationExact} minutos`
+				: `${durationExact} minuto`
+			: `${durationExact} segundos`;
+
+	return client.say(
+		channel,
+		`@${username} Ihhh rapaz, tu foi taxado hein! Daqui uns ${stringDuration} a gente se fala! Valeu, Falou!`
+	);
+}
+
+async function addUserToBlacklistFile(username, user) {
+	if (!commandsUtils.canExecute(user, ["streamer", "mod"])) {
+		return { next: false };
+	}
+
+	await blackListUtils.addUserToBlacklistFile(username);
+	return { next: true };
+}
+
+async function removeUserFromBlacklistFile(username, user) {
+	if (!commandsUtils.canExecute(user, ["streamer", "mod"])) {
+		return { next: false };
+	}
+
+	await blackListUtils.removeUserFromBlacklistFile(username);
+	return { next: true };
+}
+
+async function checkIfUserIsInBlacklist(username, user) {
+	if (!commandsUtils.canExecute(user, ["streamer", "mod"])) {
+		return { next: false };
+	}
+
+	const { user: userExist } = await blackListUtils.checkIfUserIsInBlacklist(username);
+	return { next: true, userExist };
+}
+
+async function readUsersBlacklistFile(user) {
+	if (!commandsUtils.canExecute(user, ["streamer", "mod"])) {
+		return { next: false };
+	}
+
+	const users = await blackListUtils.readUsersBlacklistFile();
+	return { next: true, users };
+}
+
+async function checkUsersBlacklist(user) {
 	if (typeof user === "string") {
 		user = { username: user };
 	}
 
-	const userQuery = new RegExp(user.username, 'gmi')
+	const { user: userExist } = await blackListUtils.checkIfUserIsInBlacklist(user.username);
 
-	return config.usersBlacklist.some(username => userQuery.test(username));
+	return userExist;
 }
 
 function replyTaxedBot(user, message) {
@@ -222,15 +366,15 @@ function replyTaxedBot(user, message) {
 		user = { username: user };
 	}
 
-	if (new RegExp(/na cara do\(a\) botfalador/gmi).test(message)) {
+	if (new RegExp(/na cara do\(a\) botfalador/gim).test(message)) {
 		if (bots.includes(user.username)) {
-			user.username = message.split(/\s/gm)[0];
+			user.username = message?.split(/\s/gm)[0];
 		}
 
 		return `Tá de tiração comigo é? ${user.username}, esse bot aqui não é educado igual o @streamelements não viu? Toma de volta na sua cara ${user.username}`;
-	} else if (new RegExp(/A Granada de Rola foi lançada.*botfalador/gmi).test(message)) {
+	} else if (new RegExp(/A Granada de Rola foi lançada.*botfalador/gim).test(message)) {
 		if (bots.includes(user.username)) {
-			user.username = message.split(/\s/gm)[0];
+			user.username = message?.split(/\s/gm)[0];
 		}
 
 		return `Tá de tiração comigo é ${user.username}?, Vai mandar granada na casa do seu amigo, aqui não! (DESVIAR)`;
