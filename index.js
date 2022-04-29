@@ -69,7 +69,7 @@ async function redeemAudio(channel, user, rewardtype, tags, message) {
 		"71c3a0a9-d3cf-40b8-867d-b85ac0faef58": {
 			instance: fala,
 			method: "run",
-			args: [channel, user, message, io, null, 2, 'Ricardo'],
+			args: [channel, user, message, io, null, 0, 'Ricardo'],
 		},
 		"886a1252-e968-4340-94de-bb8605ac72ba": {
 			instance: audio,
