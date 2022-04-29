@@ -1,13 +1,18 @@
-const { profanity } = require("@2toad/profanity");
-const ConfigClient = require("./ConfigClient.js");
+import { profanity } from "@2toad/profanity";
+import { createRequire } from "module";
+import ConfigClient from "./ConfigClient.js";
+import Bot from "./Bot.js";
+
 const config = new ConfigClient();
-const Bot = require("./Bot.js");
 const fala = new Bot({});
+
+const require = createRequire(import.meta.url);
 const badwords = require("./badwords.json");
+
 fala.profanity.addWords(badwords);
 
 console.log(
-  fala.profanity.censor(`abcdiet
+	fala.profanity.censor(`abcdiet
   affanculo
   anabootcampdiet
   bagasce
@@ -464,7 +469,7 @@ console.log(
 );
 
 console.log(
-  `abcdiet
+	`abcdiet
 affanculo
 anabootcampdiet
 bagasce
