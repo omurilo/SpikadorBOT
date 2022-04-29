@@ -161,7 +161,9 @@ async function redeemAudio(channel, user, rewardtype, tags, message) {
 	if (await checkUsersBlacklist(user)) {
 		return client.say(
 			channel,
-			`/me @${user.username ?? user} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`
+			`/me @${
+				user.username ?? user
+			} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`
 		);
 	}
 
@@ -190,14 +192,9 @@ async function messageToBot(channel, user, received, self) {
 			],
 		},
 		fala: {
-			instance: client,
-			method: "say",
-			args: [
-				channel,
-				`/me ${
-					user.username ?? user
-				} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
-			],
+			instance: fala,
+			method: "run",
+			args: [channel, user, message, io, null, 2, "Ricardo"],
 		},
 		noia: {
 			instance: audio,
@@ -210,7 +207,9 @@ async function messageToBot(channel, user, received, self) {
 			method: "say",
 			args: [
 				channel,
-				`Ei ${message?.split(/\s/)[0]} tu foi taxado irmão! Agora está na blacklist e não pode interagir comigo, valeu hein gangsta! Duas palavras pra você: Para Béns!`,
+				`Ei ${
+					message?.split(/\s/)[0]
+				} tu foi taxado irmão! Agora está na blacklist e não pode interagir comigo, valeu hein gangsta! Duas palavras pra você: Para Béns!`,
 			],
 		},
 		destaxar: {
@@ -219,7 +218,9 @@ async function messageToBot(channel, user, received, self) {
 			method: "say",
 			args: [
 				channel,
-				`Ei ${message?.split(/\s/)[0]} tu foi destaxado! Agora você não está mais na blacklist e pode interagir comigo, valeu hein gangsta! Duas palavras pra você: Para Béns!`,
+				`Ei ${
+					message?.split(/\s/)[0]
+				} tu foi destaxado! Agora você não está mais na blacklist e pode interagir comigo, valeu hein gangsta! Duas palavras pra você: Para Béns!`,
 			],
 		},
 		tataxado: {
@@ -239,13 +240,15 @@ async function messageToBot(channel, user, received, self) {
 			args: [message?.split(/\s/)[0].split(/@/), user],
 		},
 		ostaxados: {
-			instance: { verify: async () => {
-				const { users } = await readUsersBlacklistFile(user);
-				const qtyMessages = Math.max(Math.ceil(users.length / 10), 1);
-				for (let step = 0; step < qtyMessages * 10; step+=10) {
-					client.say(channel, `Os usuários na blacklist são: ${users.slice(step, step + 10)}`);
-				}
-			} },
+			instance: {
+				verify: async () => {
+					const { users } = await readUsersBlacklistFile(user);
+					const qtyMessages = Math.max(Math.ceil(users.length / 10), 1);
+					for (let step = 0; step < qtyMessages * 10; step += 10) {
+						client.say(channel, `Os usuários na blacklist são: ${users.slice(step, step + 10)}`);
+					}
+				},
+			},
 			method: "verify",
 			args: [],
 		},
@@ -270,7 +273,9 @@ async function messageToBot(channel, user, received, self) {
 		if (!commands[command]) return;
 		return client.say(
 			channel,
-			`/me @${user.username ?? user} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`
+			`/me @${
+				user.username ?? user
+			} tu foi taxado e não pode usar esse comando! (Cê tá na blacklist gangsta)`
 		);
 	}
 

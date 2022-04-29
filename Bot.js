@@ -20,7 +20,32 @@ class Bot extends CommandsModel {
 		this.profanity.addWords(badwords);
 	}
 
-	run(channel, user, message, io, roles = undefined, cooldown = undefined) {
+	pollyStreamlabs(voice = "Ricardo", text) {
+		return fetch("https://streamlabs.com/polly/speak", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				voice,
+				text,
+			}),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				if (data.success) {
+					return data.speak_url;
+				}
+
+				return false;
+			})
+			.catch((error) => {
+				console.error({ error });
+				return false;
+			});
+	}
+
+	run(channel, user, message, io, roles = undefined, cooldown = undefined, voice = "google") {
 		let language;
 		let finalMessage;
 		const haveLanguage = String(message).match(/^\[[\w\-]+\]/);
@@ -28,7 +53,9 @@ class Bot extends CommandsModel {
 		if (roles && !this.canExecute(user, roles)) {
 			return this.client.say(
 				channel,
-				`/me @${user.username ?? user} Você não pode resgatar esse audio, peça o reembolso dos seus pontos pra algum dos mod inútil que tem ai. (lista de mods: /mods)`
+				`/me @${
+					user.username ?? user
+				} Você não pode resgatar esse audio, peça o reembolso dos seus pontos pra algum dos mod inútil que tem ai. (lista de mods: /mods)`
 			);
 		}
 
@@ -45,14 +72,25 @@ class Bot extends CommandsModel {
 			finalMessage = this.profanity.censor(finalMessage);
 		}
 
-		if (cooldown && !this.checkCooldown('fala', cooldown)) {
+		if (cooldown && !this.checkCooldown("fala", cooldown)) {
 			return this.client.say(
 				channel,
 				`/me @${user.username ?? user} tu foi taxado pelo cooldown, não foi dessa vez!`
 			);
 		}
 
-		googleTTS
+		if (voice !== "google") {
+			return this.pollyStreamlabs(voice, finalMessage).then((url) => {
+				if (!url) {
+					this.client.say(channel, `Não foi possível reproduzir sua mensagem! Desculpa nóis!`);
+				}
+
+				io.to(channel.substr(1)).emit("falador", url);
+				this.client.say(channel, `@${user.username ?? user} disse: ${finalMessage}`);
+			});
+		}
+
+		return googleTTS
 			.getAudioBase64(`${user} Disse: ${finalMessage}`, {
 				lang: language,
 			})
