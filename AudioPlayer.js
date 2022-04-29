@@ -1,4 +1,4 @@
-const CommandsModel = require("./CommandsModel.js");
+import CommandsModel from "./CommandsModel.js";
 
 class AudioPlayer extends CommandsModel {
 	constructor(client) {
@@ -30,4 +30,4 @@ class AudioPlayer extends CommandsModel {
 	}
 }
 
-module.exports = AudioPlayer;
+export default AudioPlayer;

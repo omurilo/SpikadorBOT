@@ -1,16 +1,20 @@
-const dotenv = require("dotenv").config();
-const express = require("express");
-const app = express();
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, { cors: { origin: "*" } });
+import dotenv from "dotenv";
+dotenv.config();
 
-const tmi = require("tmi.js");
-const { username, channel } = require("tmi.js/lib/utils");
-const ConfigClient = require("./ConfigClient.js");
-const Bot = require("./Bot.js");
-const AudioPlayer = require("./AudioPlayer.js");
-const CommandsModel = require("./CommandsModel.js");
-const blackListUtils = require("./blacklist/usersBlacklist");
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import tmi from "tmi.js";
+// import { username, channel } from "tmi.js/lib/utils.js";
+import ConfigClient from "./ConfigClient.js";
+import Bot from "./Bot.js";
+import AudioPlayer from "./AudioPlayer.js";
+import CommandsModel from "./CommandsModel.js";
+import blackListUtils from "./blacklist/usersBlacklist.js";
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
 const bots = ["streamelements", "nightbot"];
 

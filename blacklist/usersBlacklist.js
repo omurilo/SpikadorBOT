@@ -1,13 +1,14 @@
-const fs = require("fs/promises");
-const path = require("path");
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from 'url';
 
-const filePath = path.resolve(__dirname, "users_blacklist.txt");
+const filePath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "users_blacklist.txt");
 
 async function checkIfFileExistsAndCreate() {
 	try {
 		await fs.access(filePath);
 	} catch (error) {
-		if (error.code === 'ENOENT') {
+		if (error.code === "ENOENT") {
 			await writeUsersBlacklistFile();
 		}
 	}
@@ -43,7 +44,9 @@ async function removeUserFromBlacklistFile(userToRemove) {
 	const { users, user } = await checkIfUserIsInBlacklist(userToRemove);
 	if (!user) return;
 
-	const blacklistWithoutUser = users.filter((blacklistedUser) => !!blacklistedUser && blacklistedUser !== user);
+	const blacklistWithoutUser = users.filter(
+		(blacklistedUser) => !!blacklistedUser && blacklistedUser !== user
+	);
 	await fs.writeFile(filePath, blacklistWithoutUser.join("\n"));
 }
 
@@ -51,14 +54,14 @@ async function checkIfUserIsInBlacklist(user) {
 	if (!user) return;
 
 	const users = await readUsersBlacklistFile();
-	return { users, user: users.find(blacklistedUser => new RegExp(user, 'gi').test(blacklistedUser)) }
+	return { users, user: users.find((blacklistedUser) => new RegExp(user, "gi").test(blacklistedUser)) };
 }
 
-module.exports = {
-  readUsersBlacklistFile,
-  writeUsersBlacklistFile,
-  addUserToBlacklistFile,
-  removeUserFromBlacklistFile,
+export default {
+	readUsersBlacklistFile,
+	writeUsersBlacklistFile,
+	addUserToBlacklistFile,
+	removeUserFromBlacklistFile,
 	checkIfUserIsInBlacklist,
-	checkIfFileExistsAndCreate
-}
+	checkIfFileExistsAndCreate,
+};

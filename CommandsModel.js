@@ -46,4 +46,5 @@ class CommandsModel {
 		return true;
 	}
 }
-module.exports = CommandsModel;
+
+export default CommandsModel;

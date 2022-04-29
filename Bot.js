@@ -1,7 +1,11 @@
-const googleTTS = require("google-tts-api");
-const { ProfanityOptions, Profanity } = require("@2toad/profanity");
+import googleTTS from "google-tts-api";
+import { ProfanityOptions, Profanity } from "@2toad/profanity";
+import fetch from "node-fetch";
+import { createRequire } from "module";
 
-const CommandsModel = require("./CommandsModel.js");
+import CommandsModel from "./CommandsModel.js";
+
+const require = createRequire(import.meta.url);
 const badwords = require("./badwords.json");
 
 class Bot extends CommandsModel {
@@ -64,4 +68,4 @@ class Bot extends CommandsModel {
 	}
 }
 
-module.exports = Bot;
+export default Bot;
