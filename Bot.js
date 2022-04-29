@@ -79,7 +79,7 @@ class Bot extends CommandsModel {
 			);
 		}
 
-		if (voice !== "google") {
+		if (voice !== "google" && !haveLanguage) {
 			return this.pollyStreamlabs(voice, finalMessage).then((url) => {
 				if (!url) {
 					this.client.say(channel, `Não foi possível reproduzir sua mensagem! Desculpa nóis!`);

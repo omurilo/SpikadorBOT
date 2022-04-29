@@ -69,7 +69,7 @@ async function redeemAudio(channel, user, rewardtype, tags, message) {
 		"71c3a0a9-d3cf-40b8-867d-b85ac0faef58": {
 			instance: fala,
 			method: "run",
-			args: [channel, user, message, io, null, 2],
+			args: [channel, user, message, io, null, 2, 'Ricardo'],
 		},
 		"886a1252-e968-4340-94de-bb8605ac72ba": {
 			instance: audio,
@@ -190,11 +190,6 @@ async function messageToBot(channel, user, received, self) {
 					user.username ?? user
 				} Falador é um bot de reprodução de mensagens na live, para utilizá-lo basta resgatar a mensagem com os pontos do canal e escrever o que deseja falar. Se quiser que ela seja falada em outra língua comece sua mensagem com [língua], ex: "[en]Hi, my name is bot falador!". Para saber as línguas acesse: https://cloud.google.com/translate/docs/languages`,
 			],
-		},
-		fala: {
-			instance: fala,
-			method: "run",
-			args: [channel, user, message, io, null, 2, "Ricardo"],
 		},
 		noia: {
 			instance: audio,
