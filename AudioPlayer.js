@@ -7,10 +7,11 @@ class AudioPlayer extends CommandsModel {
 
 	play(audio, channel, user, message, io, roles = undefined, cooldown = undefined) {
 		if (roles && !this.canExecute(user, roles)) {
-			return this.client.say(
+			this.client.say(
 				channel,
-				`/me @${user.username ?? user} Você não pode resgatar esse audio, peça o reembolso dos seus pontos pra algum dos mod inútil que tem ai. (lista de mods: /mods)`
+				`/me @${user.username ?? user} Você não pode resgatar esse audio, peça o reembolso dos seus pontos pra algum dos mod inútil que tem ai.`
 			);
+			return this.client.mods(channel);
 		}
 
 		if (cooldown && !this.checkCooldown(audio, cooldown)) {

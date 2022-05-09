@@ -63,8 +63,8 @@ function enterOnTwitchChat(endereco, porta) {
 	console.log(`* Bot entrou no endereço ${endereco}:${porta}`);
 }
 
-async function redeemAudio(channel, user, rewardtype, tags, message) {
-	console.info({ rewardtype, message });
+async function redeemAudio(channel, _, rewardtype, user, message) {
+	console.info({ user, rewardtype, message });
 	const commands = {
 		"71c3a0a9-d3cf-40b8-867d-b85ac0faef58": {
 			instance: fala,
